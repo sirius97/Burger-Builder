@@ -89,7 +89,7 @@ class BurgerBuilder extends Component{
 
     orderContinueHandler = () => {
         //alert("You clicked continue!")
-        this.setState({
+       /* this.setState({
             loading: true
         })
         const order = {
@@ -115,8 +115,20 @@ class BurgerBuilder extends Component{
                             loading: false,
                             purchasing:false
                         })
+                    })*/
+                    const queryParams = []
+                    for(let i in this.state.ingridiants){
+                        queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingridiants[i]))
+                    }
+                        queryParams.push('price='+ this.state.totalPrice)
+                    const queryString = queryParams.join('&')
+                    this.props.history.push({
+                        pathname: '/checkout',
+                        search: '?' + queryString
                     })
     }
+
+    
 
     render(){
         let disabledInfo = {
