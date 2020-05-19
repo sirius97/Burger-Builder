@@ -25,13 +25,14 @@ class BurgerBuilder extends Component{
     }
 
     componentDidMount () {
-        axios.get('https://burger-builder-36244.firebaseio.com/Ingrediants.json')
-                .then(response => {
-                    console.log(response.data)
-                    this.setState({ingridiants: response.data})
-                }).catch(error => {
-                    this.setState({error: true})
-                })
+        console.log(this.props)
+      axios.get('https://burger-builder-36244.firebaseio.com/Ingrediants.json')
+              .then(response => {
+                  console.log(response.data)
+                  this.setState({ingridiants: response.data})
+              }).catch(error => {
+                  this.setState({error: true})
+              })
     }
 
     updatePurchasable(upingr) {

@@ -3,14 +3,53 @@ import Button from '../../../components/UI/Button/Button';
 import classes from './ContactData.css';
 import axios from '../../../axios-order';
 import Spinner from '../../../components/UI/Spinner/Spinner';
+import Input from '../../../components/UI/Input/Input';
 
 class ContactData extends Component{
     state = {
-        name: '',
-        email: '',
-        address:{
-            street: '',
-            pin: ''
+        orderForm:{
+            name:{
+                elementTyp: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your Name'
+                },
+                value:''
+            },
+            street:{
+                elementTyp: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your Street'
+                },
+                value:''
+            },
+            zipcode:{
+                elementTyp: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'ZIP Code'
+                },
+                value:''
+            },
+            email:{
+                elementTyp: 'input',
+                elementConfig: {
+                    type: 'email',
+                    placeholder: 'Your Email'
+                },
+                value:''
+            },
+            deliveryMethod:{
+                elementTyp: 'select',
+                elementConfig: {
+                    options:[
+                        {value:'fastest',displayValue:'Fastest'},
+                        {value:'cheapest', displayValue:'Cheapest'}
+                    ]
+                },
+                value:'fastest'
+            }
         },
         loading: false,
     }
@@ -21,15 +60,14 @@ class ContactData extends Component{
         this.setState({
             loading: true
         })
+        const formData = {}
+        for(let key in this.state.orderForm){
+            formData[key] = this.state.orderForm[key].value
+        }
         const order = {
             ingrediants: this.props.ingri,
             price : this.props.price,
-            customer: {
-                customerID : 123,
-                name: "De Niro",
-                street: "Heat 42nd avenue",
-            },
-            paymentMethod: "COD"
+            orderData : formData
         }
 
         axios.post('/order.json',order)
@@ -46,14 +84,39 @@ class ContactData extends Component{
                     })
     }
 
+    changeHandler = (event, inputId) => {
+        const updatedOrderForm = {
+            ...this.state.orderForm
+        };
+        const updatedFormEle = {
+            ...updatedOrderForm[inputId]
+        }
+        updatedFormEle.value = event.target.value;
+        updatedOrderForm[inputId] = updatedFormEle;
+        this.setState({
+            orderForm : updatedOrderForm
+        }) 
+    }
+
     render(){
+        let formElement = []
+        for(let key in this.state.orderForm){
+            formElement.push({
+                id: key,
+                config: this.state.orderForm[key]
+            })
+        }
         let form = (
-            <form>
-                    <input className={classes.Input} type='text' name='name' placeholder = 'Enter Name'/>
-                    <input className={classes.Input} type='text' name='email' placeholder = 'Enter Email'/>
-                    <input className={classes.Input} type='text' name='street' placeholder = 'Enter Street'/>
-                    <input className={classes.Input} type='text' name='pin' placeholder = 'Enter Pin Code'/>
-                    <Button btnType = 'Success' clicked ={this.orderHandler}>Order</Button>
+            <form onSubmit = {this.orderHandler}>
+                    {formElement.map(ele => (
+                        <Input 
+                        key = {ele.id}
+                        elementTyp = {ele.config.elementTyp} 
+                        elementConfig = {ele.config.elementConfig} 
+                        value = {ele.config.value} 
+                        changed = {(event) => this.changeHandler(event,ele.id)}/>
+                    ))}
+                    <Button btnType = 'Success'>Order</Button>
                 </form>
         );
         if(this.state.loading){
